@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/index.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="main">
+        <div id="user_num" data-num="1"> </div>
+        <div class="main_inner clearfix">
+            <div class="panel"></div>
+            <div id="chatArea" class="box chat">
+                <div class="box_hd"></div>
+                <div class="box_bd" id="messageList">
+                    <div class="message me">
+                        <img class="avatar" src="" />
+                        <div class="content">
+                            <div class="nickname"><span class="time">10:10:08</span></div>
+                            <div class="bubble bubble_primary right">
+                                <div class="bubble_cont">
+                                    <div class="plain">
+                                        <pre>你欠我一顿大餐你欠我一顿大餐你欠我一顿大餐你欠我一顿大餐你欠我一顿大餐你欠我一顿大餐你欠我一顿大餐你欠我一顿大餐你欠我一顿大餐你欠我一顿大餐你欠我一顿大餐</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="message">
+                        <img class="avatar" src="" />
+                        <div class="content">
+                            <div class="nickname">二狗<span class="time">10:12:20</span></div>
+                            <div class="bubble bubble_default left">
+                                <div class="bubble_cont">
+                                    <div class="plain">
+                                        <pre>(⊙o⊙)…好吧</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box_ft">
+                    <div class="box_ft_bd hide">
+                        <div class="emoji_panel">
+                            <ul class="exp_hd">
+                                <li class="exp_hd_item active" data-i="0">
+                                    <a href="javascript:;">QQ表情</a>
+                                </li>
+                                <li class="exp_hd_item" data-i="1">
+                                    <a href="javascript:;">符号表情</a>
+                                </li>
+                                <li class="exp_hd_item" data-i="2">
+                                    <a href="javascript:;">动画表情</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="box_ft_hd">
+                        <div class="eaitWrap">
+                            <pre id="editArea" class="editArea" contenteditable="true"></pre>
+                        </div>
+                        <a href="javascript:;" class="web_wechat_face" id="web_wechat_face"></a>
+                        <a href="javascript:;" class="web_wechat_pic" id="web_wechat_pic"></a>
+                        <a href="javascript:;" class="btn btn_send hide" id="btn_send" onclick="doSend()">发送</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="js/index.js"></script>
+    <script type="text/javascript">
+        var user_num = $("#user_num").attr("data-num");
+        ws = new WebSocket("ws://47.94.154.39:9528?user_num="+user_num);
+        function doSend(){
+            var message = $('#editArea').text();
+            //var message = send_message;//"我是隔壁的客户端1，这是我给客户端2发的消息，阿嘎嘎嘎！";
+            var send_to_user_num = 2;
+            var send_obj = '{"message":"'+message + '","send_to_user_num":"' + send_to_user_num + '"}';
+            if (!message) {
+                return ;
+            }
+            ws.send(send_obj);                    
+
+            var send_html = '<div class="message me">' + 
+                                '<img class="avatar" src="" />'+
+                                '<div class="content">'+
+                                    '<div class="nickname"><span class="time">10:10:08</span></div>'+
+                                    '<div class="bubble bubble_primary right">'+
+                                        '<div class="bubble_cont">'+
+                                            '<div class="plain">'+
+                                                '<pre>'+message+'</pre>'+
+                                            '</div>'+
+                                        '</div>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>';
+            $("#messageList").append(send_html);
+            $("#editArea").text('');    
+        }    
+        
+        ws.onopen = function() {};    
+
+        ws.onmessage = function(evt){
+            var receive_data = evt.data;
+            var recieve_html = '<div class="message">' + 
+                                    '<img class="avatar" src="" />'+
+                                    '<div class="content">'+
+                                        '<div class="nickname">二狗<span class="time">10:10:08</span></div>'+
+                                        '<div class="bubble bubble_default left">'+
+                                            '<div class="bubble_cont">'+
+                                                '<div class="plain">'+
+                                                    '<pre>'+receive_data+'</pre>'+
+                                                '</div>'+
+                                            '</div>'+
+                                        '</div>'+
+                                    '</div>'+
+                                '</div>';
+            $("#messageList").append(recieve_html);                     
+            console.log('接收的数据为：' + receive_data);    
+        };
+        ws.onclose = function(){
+            console.log('连接关闭！！');
+        }
+    </script>
+</body>
+</html>
